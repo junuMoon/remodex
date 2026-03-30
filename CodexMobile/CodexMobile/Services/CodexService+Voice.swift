@@ -67,7 +67,7 @@ extension CodexService {
 
     // Asks the bridge for an ephemeral ChatGPT token over the E2E encrypted channel.
     private func resolveVoiceAuthToken() async throws -> String {
-        let response = try await sendRequest(method: "voice/resolveAuth", params: nil)
+        let response = try await sendRequest(method: "voice/resolveAuth", params: .object([:]))
 
         guard let payload = response.result?.objectValue,
               let token = payload["token"]?.stringValue,

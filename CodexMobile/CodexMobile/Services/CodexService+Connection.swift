@@ -261,7 +261,6 @@ extension CodexService {
 
         do {
             _ = try await sendRequest(method: "initialize", params: modernParams)
-            supportsTurnCollaborationMode = await runtimeSupportsPlanCollaborationMode()
         } catch {
             guard shouldRetryInitializeWithoutCapabilities(error) else {
                 throw error
@@ -274,8 +273,9 @@ extension CodexService {
             supportsTurnCollaborationMode = false
         }
 
-        try await sendNotification(method: "initialized", params: nil)
+        try await sendNotification(method: "initialized", params: .object([:]))
         isInitialized = true
+        supportsTurnCollaborationMode = await runtimeSupportsPlanCollaborationMode()
     }
 
     // Classifies socket failures so transient relay hiccups reconnect, while dead pairings are forgotten.
@@ -584,7 +584,7 @@ extension CodexService {
     // Uses the documented experimental listing endpoint instead of assuming initialize implies plan support.
     func runtimeSupportsPlanCollaborationMode() async -> Bool {
         do {
-            let response = try await sendRequest(method: "collaborationMode/list", params: nil)
+            let response = try await sendRequest(method: "collaborationMode/list", params: .object([:]))
             return responseContainsPlanCollaborationMode(response)
         } catch {
             return false

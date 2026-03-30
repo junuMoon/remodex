@@ -101,7 +101,10 @@ function startBridge({
   let lastRelayActivityAt = 0;
   let lastPublishedBridgeStatus = null;
   let lastConnectionStatus = null;
-  let codexHandshakeState = config.codexEndpoint ? "warm" : "cold";
+  // Each bridge->Codex websocket starts uninitialized, even when it points at a
+  // long-lived shared app-server. The process stays warm, but JSON-RPC init is
+  // still scoped to this socket.
+  let codexHandshakeState = "cold";
   const forwardedInitializeRequestIds = new Set();
   const bridgeManagedCodexRequestWaiters = new Map();
   const forwardedRequestMethodsById = new Map();
@@ -798,9 +801,9 @@ function startBridge({
     }));
   }
 
-  // The spawned/shared Codex app-server stays warm across phone reconnects.
-  // When iPhone reconnects it sends initialize again, but forwarding that to the
-  // already-initialized Codex transport only produces "Already initialized".
+  // The bridge keeps one Codex websocket alive across phone reconnects. Once that
+  // websocket has seen a successful initialize, later phone reconnects can reuse
+  // the warm session without re-forwarding the handshake.
   function handleBridgeManagedHandshakeMessage(rawMessage) {
     let parsed = null;
     try {

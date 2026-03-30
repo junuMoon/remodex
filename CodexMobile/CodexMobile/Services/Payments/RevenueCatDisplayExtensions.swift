@@ -5,6 +5,8 @@
 // Depends on: Foundation, RevenueCat, StoreKit
 
 import Foundation
+
+#if canImport(RevenueCat)
 import RevenueCat
 import StoreKit
 
@@ -49,3 +51,4 @@ extension RevenueCat.SubscriptionPeriod {
         return value > 1 ? "\(periodString)s" : periodString
     }
 }
+#endif

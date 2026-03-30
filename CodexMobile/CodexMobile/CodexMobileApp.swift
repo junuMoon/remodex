@@ -3,8 +3,11 @@
 // Layer: App
 // Exports: CodexMobileApp
 
-import RevenueCat
 import SwiftUI
+
+#if canImport(RevenueCat)
+import RevenueCat
+#endif
 
 @MainActor
 @main
@@ -54,6 +57,7 @@ struct CodexMobileApp: App {
 
     // Configures RevenueCat once at launch using the client-safe public SDK key.
     private static func configureRevenueCatIfAvailable() {
+#if canImport(RevenueCat)
         guard let apiKey = AppEnvironment.revenueCatPublicAPIKey else {
             assertionFailure("Missing RevenueCat public API key in Info.plist")
             return
@@ -64,5 +68,6 @@ struct CodexMobileApp: App {
         #endif
 
         Purchases.configure(withAPIKey: apiKey)
+#endif
     }
 }

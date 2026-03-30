@@ -4,8 +4,10 @@
 // Exports: RevenueCatPaywallView
 // Depends on: SwiftUI, SubscriptionService
 
-import RevenueCat
 import SwiftUI
+
+#if canImport(RevenueCat)
+import RevenueCat
 
 struct RevenueCatPaywallPreviewPlan: Identifiable, Equatable {
     let id: String
@@ -470,3 +472,68 @@ Spacer()
     )
     .environment(SubscriptionService())
 }
+#else
+struct RevenueCatPaywallPreviewPlan: Identifiable, Equatable {
+    let id: String
+    let title: String
+    let price: String
+    let periodLabel: String
+    let termsDescription: String
+    let isBestValue: Bool
+}
+
+struct RevenueCatPaywallView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    private let dismissable: Bool
+
+    init(
+        dismissable: Bool = true,
+        previewPlans: [RevenueCatPaywallPreviewPlan]? = nil,
+        previewLatestPurchaseDate: Date? = nil,
+        previewHasProAccess: Bool = false,
+        previewErrorMessage: String? = nil,
+        previewIsLoading: Bool = false
+    ) {
+        self.dismissable = dismissable
+        _ = previewPlans
+        _ = previewLatestPurchaseDate
+        _ = previewHasProAccess
+        _ = previewErrorMessage
+        _ = previewIsLoading
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Spacer()
+                Image(systemName: "iphone.and.arrow.forward")
+                    .font(.system(size: 42, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                Text("Subscriptions are unavailable in this local debug build.")
+                    .font(AppFont.system(size: 22, weight: .bold))
+                    .multilineTextAlignment(.center)
+                Text("This iPhone install was signed with a Personal Team so RevenueCat and App Store purchase flows are disabled here.")
+                    .font(AppFont.body())
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+                if dismissable {
+                    Button("Close") {
+                        dismiss()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                Spacer()
+            }
+            .padding(24)
+            .navigationTitle("Remodex Pro")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+#Preview {
+    RevenueCatPaywallView()
+}
+#endif

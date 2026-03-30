@@ -262,7 +262,7 @@ extension CodexService {
     // Logs the Mac-owned ChatGPT session out without touching pairing or reconnect state.
     func logoutGPTAccount() async {
         if isConnected {
-            _ = try? await sendRequest(method: "account/logout", params: nil)
+            _ = try? await sendRequest(method: "account/logout", params: .object([:]))
         }
 
         clearGPTLoginState()
@@ -587,12 +587,12 @@ extension CodexService {
     ) {
         do {
             return (
-                response: try await sendRequest(method: "account/status/read", params: nil),
+                response: try await sendRequest(method: "account/status/read", params: .object([:])),
                 allowMissingVersionPrompt: true
             )
         } catch {
             return (
-                response: try await sendRequest(method: "getAuthStatus", params: nil),
+                response: try await sendRequest(method: "getAuthStatus", params: .object([:])),
                 allowMissingVersionPrompt: shouldTreatAsUnsupportedBridgeManagedAccountStatus(error)
             )
         }

@@ -6,6 +6,8 @@
 
 import Foundation
 import Observation
+
+#if canImport(RevenueCat)
 import RevenueCat
 
 enum SubscriptionBootstrapState: Equatable {
@@ -329,3 +331,51 @@ private extension SubscriptionService {
         return error.localizedDescription
     }
 }
+#else
+enum SubscriptionBootstrapState: Equatable {
+    case idle
+    case loading
+    case ready
+    case failed
+}
+
+struct SubscriptionPackageOption: Identifiable {
+    let id: String
+    let title: String
+    let price: String
+    let periodLabel: String
+    let termsDescription: String
+}
+
+@MainActor
+@Observable
+final class SubscriptionService {
+    // Local personal-team builds skip RevenueCat so the app still installs on-device.
+    private(set) var bootstrapState: SubscriptionBootstrapState = .ready
+    private(set) var packageOptions: [SubscriptionPackageOption] = []
+    private(set) var hasProAccess = true
+    private(set) var latestPurchaseDate: Date?
+    private(set) var willRenew = false
+    private(set) var managementURL: URL?
+    private(set) var isLoading = false
+    private(set) var isPurchasing = false
+    private(set) var isRestoring = false
+    private(set) var lastErrorMessage: String?
+
+    init(defaults: UserDefaults = .standard) {
+        _ = defaults
+    }
+
+    func bootstrap() async {}
+
+    func refreshCustomerInfoSilently() async {}
+
+    func loadOfferings() async {}
+
+    func purchase(_ option: SubscriptionPackageOption) async {
+        _ = option
+    }
+
+    func restorePurchases() async {}
+}
+#endif
